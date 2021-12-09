@@ -546,7 +546,7 @@ sub take_snapshots {
 			my @snapshots;
 
 			foreach my $type (@types) {
-				my $snapname = "autosnap_$datestamp{'sortable'}_$type";
+				my $snapname = "autosnap_" . $type . "_$datestamp{'sortable'}";
 				push(@snapshots, $snapname);
 			}
 
@@ -827,11 +827,11 @@ sub getsnaps {
 	}
 
 	foreach my $snap (@rawsnaps) {
-		my ($fs,$snapname,$snapdate) = ($snap =~ m/(.*)\@(.*ly)\t*creation\t*(\d*)/);
+		my ($fs,$snapname,$snapdate) = ($snap =~ m/(.*)\@(autosnap_.*ly_[-0-9_]*)\t*creation\t*(\d*)/);
 
 		# avoid pissing off use warnings
 		if (defined $snapname) {
-			my ($snaptype) = ($snapname =~ m/.*_(\w*ly)/);
+			my ($snaptype) = ($snapname =~ m/autosnap_(\w*ly)_.*/);
 			if ($snapname =~ /^autosnap/) {
 				$snaps{$fs}{$snapname}{'ctime'}=$snapdate;
 				$snaps{$fs}{$snapname}{'type'}=$snaptype;
@@ -1024,8 +1024,8 @@ sub get_date {
 	$datestamp{'hour'} = sprintf ("%02u", $datestamp{'hour'});
 	$datestamp{'mday'} = sprintf ("%02u", $datestamp{'mday'});
 	$datestamp{'mon'} = sprintf ("%02u", ($datestamp{'mon'} + 1));
-	$datestamp{'noseconds'} = "$datestamp{'year'}-$datestamp{'mon'}-$datestamp{'mday'}_$datestamp{'hour'}:$datestamp{'min'}";
-	$datestamp{'sortable'} = "$datestamp{'noseconds'}:$datestamp{'sec'}";
+	$datestamp{'noseconds'} = "$datestamp{'year'}-$datestamp{'mon'}-$datestamp{'mday'}_$datestamp{'hour'}-$datestamp{'min'}";
+	$datestamp{'sortable'} = "$datestamp{'noseconds'}-$datestamp{'sec'}";
 	return %datestamp;
 }
 
